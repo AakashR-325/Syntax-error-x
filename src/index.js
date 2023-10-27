@@ -1,17 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { LandingScreen, HomeScreen, Dashboard, CreateScreen, ErrorPage } from "./routes";
+import '@fontsource/roboto/100.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/500.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <LandingScreen />,
+        errorElement : <ErrorPage />
+    },
+    {
+        path : '/home',
+        element : <HomeScreen />,
+        errorElement : <ErrorPage />,
+        children : [
+            {
+                path : '/home/dashboard',
+                element : <Dashboard />,
+                errorElement : <ErrorPage />,
+            },
+            {
+                path : '/home/create',
+                element : <CreateScreen />,
+                errorElement : <ErrorPage />,
+            },
+        ]
+     }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+])
+
+ReactDOM.render(
+    <RouterProvider router={router} />, document.getElementById('root')
+)
