@@ -1,14 +1,16 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
-//import { PRIVATE_KEY } from "../env";
-//import { INFURA_ENDPOINT } from "../env";
-/** @type import('hardhat/config').HardhatUserConfig */
+
+const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
 module.exports = {
   solidity: "0.8.20",
+  defaultNetwork: "polygon_mumbai",
   networks: {
-    testnet: {
-      url: "https://polygon-mumbai.infura.io/v3/0faf246c4dde4496ab2d4727068330ba",
-      accounts: ["f4ded818e12218c2f26d30b171b560a378d8126c6e7440f9658e854e60eace6d"],
+    polygon_mumbai: {
+      url: POLYGON_RPC_URL,
+      accounts: [PRIVATE_KEY],
     }
   }
 };

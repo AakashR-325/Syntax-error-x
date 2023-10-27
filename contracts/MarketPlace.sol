@@ -1,51 +1,50 @@
-// SPDX-License-Identifier: SEE LICENSE IN LICENSE
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract MarketPlace is ReentrancyGuard {
-    uint public itemCount;
 
-    struct Item {
-        uint itemId;
+    uint256 public itemCount;
+    struct NFTItem {
+        uint256 itemId;
         IERC721 nft;
-        uint tokenId;
-        uint price;
+        uint256 tokenId;
+        uint256 price;
         address payable seller;
         bool sold;
     }
+    mapping(uint256 => NFTItem) public uintToItem;
 
-    mapping(uint => Item) public items;
 
-    event Offered(
-        uint itemId,
+    event NFTListed(
+        uint256 itemId,
         address indexed nft,
-        uint tokenId,
-        uint price,
+        uint256 tokenId,
+        uint256 price,
         address indexed seller
     );
-    event Bought(
-        uint itemId,
+    event NFTBought(
+        uint256 itemId,
         address indexed nft,
-        uint tokenId,
-        uint price,
+        uint256 tokenId,
+        uint256 price,
         address indexed seller,
         address indexed buyer
     );
 
-    function makeItem(
+    function makeNFTItem(
         IERC721 _nft,
-        uint _tokenId,
-        uint _price
+        uint256 _tokenId,
+        uint256 _price
     ) external nonReentrant {
-        require(_price > 0, "price must be greatre than zero.");
-
+        require(_price > 0, "Price must be greater than zero");
         itemCount++;
 
-        _nft.transferFrom(msg.sender, address(this), _price);
+        _nft.transferFrom(msg.sender, address(this), _price); // Transfers NFT to contract
 
-        items[itemCount] = Item(
+        uintToItem[itemCount] = NFTItem( // Adds item to mapping
             itemCount,
             _nft,
             _tokenId,
@@ -54,11 +53,11 @@ contract MarketPlace is ReentrancyGuard {
             false
         );
 
-        emit Offered(itemCount, address(_nft), _tokenId, _price, msg.sender);
+        emit NFTListed(itemCount, address(_nft), _tokenId, _price, msg.sender);
     }
 
-    function buyItem(uint _itemId) external payable nonReentrant {
-        Item storage item = items[_itemId];
+    function purchaseNFTItem(uint256 _itemId) external payable nonReentrant {
+        NFTItem storage item = uintToItem[_itemId];
         require(_itemId > 0 && _itemId <= itemCount, "Item doesnt exist");
         require(
             msg.value >= item.price,
@@ -66,13 +65,12 @@ contract MarketPlace is ReentrancyGuard {
         );
         require(!item.sold, "Item already sold");
 
-        item.seller.transfer(item.price);
-
+        item.seller.transfer(item.price); // Sends ETH to seller
         item.sold = true;
 
         item.nft.transferFrom(address(this), msg.sender, item.tokenId);
 
-        emit Bought(
+        emit NFTBought(
             item.itemId,
             address(item.nft),
             item.tokenId,
