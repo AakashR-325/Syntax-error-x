@@ -64,7 +64,7 @@ const CustomTextField = ({ message, fieldState, id, handleFieldChange }) => {
     )
 }
 
-const UploadField = ({ message, handleValueChange, isMultiple}) => {
+const UploadField = ({ message, handleValueChange, isMultiple }) => {
     const [uploaded, setUploaded] = useState(false)
     let icon = uploaded ? <FileDownloadDoneIcon /> : <DriveFolderUploadIcon />
     return (
@@ -78,22 +78,22 @@ const UploadField = ({ message, handleValueChange, isMultiple}) => {
                 {message}
             </Typography>
             {/* <InputFileUpload handleValueChange={handleValueChange} /> */}
-            <Dropzone onDrop={acceptedFiles => 
-                {
-                    //bad code
-                    if(acceptedFiles.length === 1) {
-                        handleValueChange(acceptedFiles[0])
-                    }
-                    else if(acceptedFiles.length > 1) {
-                        handleValueChange(acceptedFiles)
-                    }
-                }} 
+            <Dropzone onDrop={acceptedFiles => {
+                //bad code
+                if (acceptedFiles.length === 1) {
+                    handleValueChange(acceptedFiles[0])
+                }
+                else if (acceptedFiles.length > 1) {
+                    handleValueChange(acceptedFiles)
+                }
+            }}
                 accept={{
-                    'image/*' : ['.png', '.jpg', '.webp']}
-                } 
+                    'image/*': ['.png', '.jpg', '.webp']
+                }
+                }
                 multiple={isMultiple}
                 onDropAccepted={() => setUploaded(true)}
-                >
+            >
                 {({ getRootProps, getInputProps }) => (
                     <section>
                         <div {...getRootProps()}>
@@ -184,6 +184,7 @@ const CreateScreen = () => {
                         justifyContent: 'space-between',
                         alignContent: 'center',
                     }}>
+
                         <Box>
 
                             <CustomTextField field={title} handleFieldChange={handleTitleChange}
@@ -195,11 +196,13 @@ const CreateScreen = () => {
                             <CustomTextField field={price} handleFieldChange={handlePriceChange}
                                 message="Give your asset pack a price" id='price'
                             />
-                            <UploadField message="Upload the cover art preview for your assets" handleValueChange={handleCoverChange} isMultiple={false}/>
-                            <UploadField message="Upload your assets stored in a folder. Upload a single folder only" handleValueChange={handleFolderChange} isMultiple={true}/>
+                            <UploadField message="Upload the cover art preview for your assets" handleValueChange={handleCoverChange} isMultiple={false} />
+                            <UploadField message="Upload your assets stored in a folder. Upload a single folder only" handleValueChange={handleFolderChange} isMultiple={true} />
                         </Box>
-                        <Button variant='contained'>Mint these nuts</Button>
-                        <Typography variant='p'>*Refresh the page to reupload your assets :)</Typography>
+                        <Fade>
+                            <Button variant='contained'>Mint these nuts</Button>
+                        </Fade>
+                        <Typography variant='p' sx={{marginTop : '1rem'}}>*Refresh the page to reupload your assets :)</Typography>
                     </Paper>
                 </Grid>
 

@@ -1,11 +1,17 @@
 import React from 'react'
-import { AppBar, List, ListItem, ListItemButton, ListItemText, Avatar, Typography, Toolbar, Button, CssBaseline, Container } from '@mui/material'
+import { ethers } from 'ethers'
+import { AppBar, List, ListItem, ListItemButton, ListItemText, Avatar, Typography, Box, Toolbar, Button, CssBaseline, Container } from '@mui/material'
 import { Link, Outlet } from 'react-router-dom'
+import { userAdded } from '../features/user/userSlice'
+import { useSelector, useDispatch } from 'react-redux'
+
+const addressDisplay = (address) => `${address.slice(0, 8)}...${address.slice(34, 42)}`
+
 
 const pages = [
     {
         name: 'Marketplace',
-        path: '/home/marketplace',
+        path: '/home/marketplace/listings',
 
     },
     {
@@ -28,27 +34,66 @@ const pageMenus = pages.map(page => {
     )
 })
 
+
+
+const CustomAvatar = () => {
+    const dispatch = useDispatch()
+    const userState = useSelector(state => state.user)
+    const connectHandler = async () => {
+        const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+        });
+        const account = ethers.getAddress(accounts[0]);
+        dispatch(
+            userAdded({
+                address: account
+            })
+        )
+    };
+    let component = userState.address === '' ? <Button variant='contained' onClick={connectHandler}>Connect Wallet</Button> : (
+        <div style={{display : 'flex', alignItems : 'center'}}>
+            <Avatar src='/MetaMask_Fox.png'>
+            </Avatar>
+            <Typography>{addressDisplay(userState.address)}</Typography>
+        </div>
+    )
+
+    return (
+        <div>
+            {component}
+        </div>
+    )
+}
+
 const HomeScreen = () => {
     return (
         <div style={{ height: '100%' }}>
             <CssBaseline />
             <AppBar position='static' sx={{
-                backgroundColor: '#262626'
+                backgroundColor: '#262626',
             }}>
                 <Toolbar sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
                 }}>
-                    <Typography>LOGO HERE</Typography>
-                    <Container>
-                        <List sx={{
-                            display: 'flex',
-                            width: '50%',
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        width: '30%'
+                    }}>
+                        <Button sx={{ color: 'white' }} component={Link} to='/home/'>DA APP</Button>
+                        <Container sx={{
                         }}>
-                            {pageMenus}
-                        </List>
-                    </ Container>
-                    <Avatar>UN</Avatar>
+                            <List sx={{
+                                display: 'flex',
+                                // width: '50%',
+                            }}>
+                                {pageMenus}
+                            </List>
+                        </ Container>
+                    </Box>
+                    <CustomAvatar />
                 </Toolbar>
             </AppBar>
             <Outlet />
