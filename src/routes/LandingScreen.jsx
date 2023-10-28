@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, Grid, CssBaseline, Typography, Box } from '@mui/material'
 import { Link } from 'react-router-dom'
+import { Fade } from 'react-awesome-reveal'
 
 const LandingScreen = () => {
   return (
@@ -20,15 +21,17 @@ const LandingScreen = () => {
           height: '50%',
           justifyContent: 'center',
         }}>
-          <Box marginBottom='2rem'>
-            <Typography textAlign='center' variant='h3' color="white" sx={{
-              fontWeight: '500',
-            }}>Welcome to whatever this app is called.</Typography>
-            <Typography textAlign='center' variant='h5' color="white" sx={{
-              fontWeight: '100'
-            }}>Get the services of whatever the hell we're providing</Typography>
-          </Box>
-          <Button component={Link} to='/home/dashboard' variant='contained'>Connect your wallet</Button>
+          <Fade cascade delay={0.2}>
+            <Box marginBottom='2rem'>
+              <Typography textAlign='center' variant='h3' color="white" sx={{
+                fontWeight: '500',
+              }}>Welcome to whatever this app is called.</Typography>
+              <Typography textAlign='center' variant='h5' color="white" sx={{
+                fontWeight: '100'
+              }}>Get the services of whatever the hell we're providing</Typography>
+            </Box>
+            <Button component={Link} to='/home/dashboard' variant='contained'>Connect your wallet</Button>
+          </Fade>
         </Grid>
       </Grid>
     </>
