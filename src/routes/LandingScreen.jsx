@@ -30,7 +30,7 @@ const LandingScreen = () => {
                 fontWeight: '100'
               }}>Get the services of whatever the hell we're providing</Typography>
             </Box>
-            <Button component={Link} to='/home/dashboard' variant='contained'>Connect your wallet</Button>
+            <Button component={Link} to='/home/' variant='contained'>Get started with Metamask</Button>
           </Fade>
         </Grid>
       </Grid>
