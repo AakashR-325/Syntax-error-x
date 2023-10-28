@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract MarketPlace is ReentrancyGuard {
-
     uint256 public itemCount;
     struct NFTItem {
         uint256 itemId;
@@ -14,9 +13,9 @@ contract MarketPlace is ReentrancyGuard {
         uint256 price;
         address payable seller;
         bool sold;
+        address payable owner;
     }
     mapping(uint256 => NFTItem) public uintToItem;
-
 
     event NFTListed(
         uint256 itemId,
@@ -50,7 +49,8 @@ contract MarketPlace is ReentrancyGuard {
             _tokenId,
             _price,
             payable(msg.sender),
-            false
+            false,
+            payable(msg.sender),
         );
 
         emit NFTListed(itemCount, address(_nft), _tokenId, _price, msg.sender);
@@ -66,6 +66,7 @@ contract MarketPlace is ReentrancyGuard {
         require(!item.sold, "Item already sold");
 
         item.seller.transfer(item.price); // Sends ETH to seller
+        item.owner = payable(msg.sender);
         item.sold = true;
 
         item.nft.transferFrom(address(this), msg.sender, item.tokenId);
