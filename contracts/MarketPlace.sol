@@ -50,7 +50,7 @@ contract MarketPlace is ReentrancyGuard {
             _price,
             payable(msg.sender),
             false,
-            payable(msg.sender),
+            payable(msg.sender)
         );
 
         emit NFTListed(itemCount, address(_nft), _tokenId, _price, msg.sender);

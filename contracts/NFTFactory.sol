@@ -9,9 +9,9 @@ uint256 public tokenId;
 constructor() ERC721("NFTFactory", "NFT"){}
 
 
-function mintNFT(string memory _tokenURI, bytes memory _metaData) public returns (uint256){
+function mintNFT(string memory _tokenURI) public returns (uint256){
     tokenId++;
-    _safeMint(msg.sender, tokenId, _metaData);
+    _safeMint(msg.sender, tokenId);
     _setTokenURI(tokenId, _tokenURI);
     return tokenId;
     }
