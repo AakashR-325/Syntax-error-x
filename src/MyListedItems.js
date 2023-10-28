@@ -14,7 +14,8 @@ export default MyListedItems =  (marketPlace , nft , account , loading , setLoad
           itemId : item.itemId,
           name : metadata.name,
           description : metadata.description,
-          file : metadata.file
+          file : metadata.file,
+          image:metadata.image,
         }
 
         listedItems.push(item);
