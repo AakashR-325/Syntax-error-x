@@ -25,10 +25,10 @@ const LandingScreen = () => {
             <Box marginBottom='2rem'>
               <Typography textAlign='center' variant='h3' color="white" sx={{
                 fontWeight: '500',
-              }}>Welcome to whatever this app is called.</Typography>
+              }}>Welcome to DeSprite</Typography>
               <Typography textAlign='center' variant='h5' color="white" sx={{
                 fontWeight: '100'
-              }}>Get the services of whatever the hell we're providing</Typography>
+              }}>Get the services of the app by connecting your wallet</Typography>
             </Box>
             <Button component={Link} to='/home/' variant='contained'>Get started with Metamask</Button>
           </Fade>

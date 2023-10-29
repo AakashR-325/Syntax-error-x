@@ -233,7 +233,7 @@ const CreateScreen = () => {
                 }}>
                     <Fade triggerOnce>
                         <Typography variant='h3' color='white'>
-                            Mint your assets as an NFT and take control or some lame shit like that.
+                            Mint your assets as an NFT.
                         </Typography>
                     </Fade>
                 </Grid>
@@ -268,7 +268,7 @@ const CreateScreen = () => {
                             <UploadField message="Upload your assets stored in a folder. Upload a single folder only" handleValueChange={handleFolderChange} isMultiple={false} />
                         </Box>
                         <Fade>
-                            <Button variant='contained' onClick={() => onUpload(folderUri)}>Mint these nuts</Button>
+                            <Button variant='contained' onClick={() => onUpload(folderUri)}>Mint</Button>
                         </Fade>
                         <Typography variant='p' sx={{ marginTop: '1rem' }}>*Refresh the page to reupload your assets :)</Typography>
                     </Paper>
