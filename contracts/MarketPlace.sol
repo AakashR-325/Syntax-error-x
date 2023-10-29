@@ -38,10 +38,9 @@ contract MarketPlace is ReentrancyGuard {
         uint256 _tokenId,
         uint256 _price
     ) external nonReentrant {
-        require(_price > 0, "Price must be greater than zero");
         itemCount++;
 
-        _nft.transferFrom(msg.sender, address(this), _price); // Transfers NFT to contract
+        _nft.transferFrom(msg.sender, address(this), _tokenId); // Transfers NFT to contract
 
         uintToItem[itemCount] = NFTItem( // Adds item to mapping
             itemCount,

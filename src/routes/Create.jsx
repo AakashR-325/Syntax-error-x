@@ -6,30 +6,34 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import FileDownloadDoneIcon from '@mui/icons-material/FileDownloadDone';
 import Dropzone from 'react-dropzone';
+import { uploadFileToIPFS, uploadJSONToIPFS } from '../pinata.js';
+import NFTFactoryABI from '../contract-details/NFTFactoryABI.json'
+import { ethers } from 'ethers';
+import { useSelector } from 'react-redux';
+import { providerAdded } from '../features/user/userSlice.js';
+
+const marketplaceAddress = "0xd3B9396e2Bd54e180440B113f2569e72541b5A60"
+const factoryAddress = "0x35BFa15f4a26e863EB051274E9a81DaE84E12ECB"
 
 const capitalize = (word) => {
     return `${word.charAt(0).toUpperCase()}${word.substring(1)}`
 }
 
-const fileToDataUri = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        resolve(event.target.result)
-    };
-    reader.readAsDataURL(file);
-})
 
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
+// async function uploadMetaDataToIPFS(){
+
+// }
+
+
+// const fileToDataUri = (file) => new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.onload = (event) => {
+//         resolve(event.target.result)
+//     };
+//     reader.readAsDataURL(file);
+// })
+
+
 
 // const InputFileUpload = ({ handleValueChange }) => {
 //     return (
@@ -78,15 +82,17 @@ const UploadField = ({ message, handleValueChange, isMultiple }) => {
                 {message}
             </Typography>
             {/* <InputFileUpload handleValueChange={handleValueChange} /> */}
-            <Dropzone onDrop={acceptedFiles => {
-                //bad code
-                if (acceptedFiles.length === 1) {
+            <Dropzone onDrop={
+                acceptedFiles => {
+                    //bad code
+                    // if (acceptedFiles.length === 1) {
+                    //     handleValueChange(acceptedFiles[0])
+                    // }
+                    // else if (acceptedFiles.length > 1) {
+                    //     handleValueChange(acceptedFiles)
+                    // }
                     handleValueChange(acceptedFiles[0])
-                }
-                else if (acceptedFiles.length > 1) {
-                    handleValueChange(acceptedFiles)
-                }
-            }}
+                }}
                 accept={{
                     'image/*': ['.png', '.jpg', '.webp']
                 }
@@ -107,16 +113,17 @@ const UploadField = ({ message, handleValueChange, isMultiple }) => {
     )
 }
 const CreateScreen = () => {
+    const userState = useSelector(state => state.user)
+    const account = userState.address
+    const factoryContract = userState.factory
+    const marketplaceContract = userState.marketplace
+    const provider = userState.provider
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
-    const [price, setPrice] = useState('')
-    const [coverUri, setCoverUri] = useState('')
-    const [folderUri, setFolderUri] = useState([])
+    const [price, setPrice] = useState(0)
+    const [coverUri, setCoverUri] = useState()
+    const [folderUri, setFolderUri] = useState()
 
-    useEffect(() => {
-        console.log(coverUri)
-        return () => console.log(coverUri)
-    }, [])
     const handleTitleChange = (e) => {
         setTitle(e.target.value)
     }
@@ -127,27 +134,88 @@ const CreateScreen = () => {
         setPrice(e.target.value)
     }
     const handleCoverChange = (coverFile) => {
-        if (!coverFile) {
-            setCoverUri('');
+        // if (!coverFile) {
+        //     setCoverUri('');
+        //     return;
+        // }
+        // fileToDataUri(coverFile).then(dataUri => {
+        //     console.log(dataUri)
+        //     setCoverUri(dataUri)
+        // })
+        setCoverUri(coverFile)
+    }
+    const handleFolderChange = (assetFile) => {
+        // if (!folderFileUris) {
+        //     setFolderUri([]);
+        //     return;
+        // }
+        // folderFileUris.forEach(fileUri => {
+        //     fileToDataUri(fileUri).then(dataUri => {
+        //         let newUriList = [...folderUri, dataUri]
+        //         setFolderUri(newUriList)
+        //     })
+        // })
+        setFolderUri(assetFile)
+
+    }
+
+    const handleMint = () => {
+
+    }
+
+    const onUpload = async (folderURI) => {
+
+        const response = await uploadFileToIPFS(folderURI)
+        if (response.success === true) {
+            console.log("File uploaded to pinata successfully, " + response.pinataURL)
+        }
+        else {
+            console.log("File not uploaded")
             return;
         }
-        fileToDataUri(coverFile).then(dataUri => {
-            console.log(dataUri)
-            setCoverUri(dataUri)
-        })
-    }
-    const handleFolderChange = (folderFileUris) => {
-        if (!folderFileUris) {
-            setFolderUri([]);
+        const jsonBody = {
+            title: title,
+            description: description,
+            price: price,
+            coverUri: coverUri,
+            fileUri: response.pinataURL
+        }
+        const JSONResponse = await uploadJSONToIPFS(jsonBody);
+        if (JSONResponse.success === true) {
+            console.log("File metadata uploaded successfully, " + JSONResponse.pinataURL)
+            const tokenUri = JSONResponse.pinataURL;
+            console.log(factoryContract)
+            const signer = await provider.getSigner();
+            try{
+                const transaction = await factoryContract.connect(signer).mintNFT(tokenUri)
+                await transaction.wait();
+                console.log(transaction)
+                const newNFTContract = new ethers.Contract(factoryAddress, NFTFactoryABI, provider)
+                const tokenID = await newNFTContract.tokenId()
+                console.log(tokenID)
+                const approvalResponse = await factoryContract.connect(signer).setApprovalForAll(marketplaceAddress , true)
+                await approvalResponse.wait()
+                // let listingPrice = ethers.parseEther(price)
+                // console.log(listingPrice)
+                let addr = await newNFTContract.getAddress()
+                console.log(addr)
+                const marketTransaction = await marketplaceContract.connect(signer).makeNFTItem(addr, tokenID, price)
+                await marketTransaction.wait()
+                // console.log(marketTransaction)
+            } catch(error) {
+                console.log(error)
+            }
+
+        }
+        else {
+            console.log("An error occured while uploading json to ipfs")
             return;
         }
-        folderFileUris.forEach(fileUri => {
-            fileToDataUri(fileUri).then(dataUri => {
-                let newUriList = [...folderUri, dataUri]
-                setFolderUri(newUriList)
-            })
-        })
+
+
+
     }
+
     return (
         <div style={{ backgroundColor: 'black', minHeight: '100vh' }}>
             <CssBaseline />
@@ -197,12 +265,12 @@ const CreateScreen = () => {
                                 message="Give your asset pack a price" id='price'
                             />
                             <UploadField message="Upload the cover art preview for your assets" handleValueChange={handleCoverChange} isMultiple={false} />
-                            <UploadField message="Upload your assets stored in a folder. Upload a single folder only" handleValueChange={handleFolderChange} isMultiple={true} />
+                            <UploadField message="Upload your assets stored in a folder. Upload a single folder only" handleValueChange={handleFolderChange} isMultiple={false} />
                         </Box>
                         <Fade>
-                            <Button variant='contained'>Mint these nuts</Button>
+                            <Button variant='contained' onClick={() => onUpload(folderUri)}>Mint these nuts</Button>
                         </Fade>
-                        <Typography variant='p' sx={{marginTop : '1rem'}}>*Refresh the page to reupload your assets :)</Typography>
+                        <Typography variant='p' sx={{ marginTop: '1rem' }}>*Refresh the page to reupload your assets :)</Typography>
                     </Paper>
                 </Grid>
 

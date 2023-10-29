@@ -1,8 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 
-const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const POLYGON_RPC_URL = "https://polygon-mumbai.infura.io/v3/0faf246c4dde4496ab2d4727068330ba";
 
 module.exports = {
   solidity: "0.8.20",

@@ -1,6 +1,8 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { NFTCard } from '../components'
-import {CssBaseline, Grid, Typography} from '@mui/material'
+import {CssBaseline, Grid, Typography, Button} from '@mui/material'
+import { loadCreatedItems, loadListedItems } from '../MyListedItems'
+import { useSelector } from 'react-redux'
 
 const samplePacks = [
     {
@@ -42,11 +44,22 @@ const samplePacks = [
 ]
 
 const OwnListings = () => {
+    const [loading, setLoading] = useState(true)
+    const [listedItems, setListedItems] = useState([])
+    const userState = useSelector(state => state.user)
+    const factoryContract = userState.factory
+    const marketplaceContract = userState.marketplace
+    const provider = userState.provider
+    const account = userState.address
     const assetPacks = samplePacks.map(pack => {
         return (
             <NFTCard pack={pack} columns={3} />
         )
     })
+
+    useEffect(() => {
+        loadCreatedItems(provider, factoryContract, account, loading, setLoading, setListedItems)
+    }, [])
     return (
         <div style={{
             width : '80%',
@@ -55,6 +68,7 @@ const OwnListings = () => {
             paddingRight : '2rem',
         }}>
             <CssBaseline />
+            <Button onClick={() => console.log(listedItems)}>Print state</Button>
             <Typography textAlign='center' color='white' variant='h3' sx={{
                 fontWeight : '300',
                 marginBottom : '2rem',

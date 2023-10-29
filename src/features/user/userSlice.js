@@ -1,15 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-    address : ''
+    address: '',
+    provider: '',
+    marketplace : {},
+    factory : {},
 }
 const userSlice = createSlice({
-    name : 'user',
+    name: 'user',
     initialState,
-    reducers : {
+    reducers: {
         userAdded(state, action) {
             state.address = action.payload.address
-        }
+        },
+        providerAdded(state, action) {
+            state.provider = action.payload.provider
+        },
+        marketplaceAdded(state, action) {
+            state.marketplace = action.payload.marketplace
+        },
+        factoryAdded(state, action) {
+            state.factory = action.payload.factory
+        },
     }
 })
-export const {userAdded} = userSlice.actions
+export const { userAdded, providerAdded, marketplaceAdded, factoryAdded } = userSlice.actions
 export default userSlice.reducer
