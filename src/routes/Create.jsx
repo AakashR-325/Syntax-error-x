@@ -201,6 +201,7 @@ const CreateScreen = () => {
                 console.log(addr)
                 const marketTransaction = await marketplaceContract.connect(signer).makeNFTItem(addr, tokenID, price)
                 await marketTransaction.wait()
+                alert("NFT Minted!")
                 // console.log(marketTransaction)
             } catch(error) {
                 console.log(error)
